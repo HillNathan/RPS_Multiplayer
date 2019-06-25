@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Multiplayer Rock-Paper-Scissors</title>
+
+    <!-- include my jQuery scripts -->
+    <script
+        src="http://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+        crossorigin="anonymous"></script>
+
+    <!-- include my firebase scripts -->
+    <script src="https://www.gstatic.com/firebasejs/6.2.2/firebase-app.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-auth.js"></script> -->
+    <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+
+    <!-- include my own script file -->
+    <script src="assets/javascript/app.js"></script>
+
+    <!-- include the Bootstrap CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/style.css">
+
+
+
+</head>
+<body>
+<div class="container">
+    <!-- HEADER SECTION-->
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron text-center display-3 mb-2">
+                Multiplayer Rock-Paper-Scissors!!!
+            </div> 
+        </div>
+    </div>
+
+    <!-- GAME SECTION -->
+    <div class="row">
+        <!-- Column for player 1 -->
+        <div class="col-md-3 my-style m-2">
+            <div class="h3 text-center" >Local Player</div>
+            <hr>
+            <div class="player-name" id="local-name"></div>
+            <hr>
+            <div class="button-container">
+            <div class="btn-group-vertical rps-buttons" role="group">
+                <button type="button" class="btn btn-info m-1 game-button" value="ROCK">Rock</button>
+                <button type="button" class="btn btn-info m-1 game-button" value="PAPER">Paper</button>
+                <button type="button" class="btn btn-info m-1 game-button" value="SCISSORS">Scissors</button>
+            </div></div>
+            <hr>
+            <ul class="list-group">
+                <li class="list-group-item m-1">Wins : <div id="p1-wins"></div></li>
+                <li class="list-group-item m-1">Losses : <div id="p1-losses"></div></li>
+            </ul>
+
+        </div>
+
+        <!-- Column for the game info to be in the middle -->
+        <div class="col my-style m-2 p-3">
+            <h2>Welcome to Rock Paper Scissors where the rules are made up and the points don't matter.</h2>
+            <p>Please enter your name and click start to begin a game!</p>
+            <form>
+                <input type="text" id="my-name">
+            </form>
+            <p><div class="button-container">
+                <button type="button" class="btn btn-info m1" id="start-btn">Start</button>
+            </div></p>
+        </div>
+
+        <!-- Column for player 2 -->
+        <div class="col-md-3 my-style m-2">
+                <div class="h3 text-center" >Opponent</div>
+                <hr>
+                <div class="player-name" id="player2-name">Jurgen Noddie</div>
+                <hr>
+                <div id="remote-info"></div>
+                <hr>
+                <ul class="list-group">
+                    <li class="list-group-item m-1">Wins : <div id="p2-wins"></div></li>
+                    <li class="list-group-item m-1">Losses : <div id="p2-losses"></div></li>
+                </ul>
+        </div>
+    </div>
+
+
+            
+
+    
+
+
+
+
+
+
+</div> <!-- close out the container-->
+
+<div class="row">
+        <div class="col">
+            <div class="footer text-center">
+                <span class="h4"> &copy; 2019 Nathan Hill</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
