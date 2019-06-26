@@ -12,8 +12,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 // --------------------------------------------------------------------------------
 // Now we set up the database reference:
-var gameDBRef = firebase.database().ref();
-console.log(gameDBRef);
+var gameDB = firebase.database();
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
 var legalChoices = ["ROCK", "PAPER", "SCISSORS"];
@@ -21,43 +20,60 @@ var legalChoices = ["ROCK", "PAPER", "SCISSORS"];
 // Wrap all the rest of the game code in document.ready function. 
 $(document).ready(function() {
   var gameObj = {
+    // localPlayer and remotePlayer align exactly to the firebase object for the game. 
     localPlayer: {
-      //playerNum will be 'player1' or 'player2' to interact with the firebase DB
-      playerNum: "",
       assigned: false,
-      playerName: "",
+      name: "",
       wins: 0,
       losses: 0,
-      myChoice: "",
-      displayName: $("#local-name"),
+      throw: "",
   },
   
-  remotePlayer: {
-    //playerNum will be 'player1' or 'player2' to interact with the firebase DB
-    playerNum: "",
-    assigned: false,
-    playerName: "",
-    wins: 0,
-    losses: 0,
-    myChoice: "",
-    displayName: $("#player2-name"),
-  },
+    remotePlayer: {
+      assigned: false,
+      name: "",
+      wins: 0,
+      losses: 0,
+      throw: "",
+    },
   
   gameButton: $(".game-button"),
-  startButton: $("#start-btn")
-  
+  startButton: $("#start-btn"),
+  dispLocalName: $("#local-name"),
+  dispRemoteName: $("#remote-name"),
   
   }
 
-gameObj.startButton.on("click", function() {
-  gameObj.localPlayer.playerName = $("#my-name").val().trim();
-  console.log(gameObj.localPlayer.playerName)
-  gameObj.localPlayer.displayName.text(gameObj.localPlayer.playerName);
-  
-});
+  // Some click functions for all of our buttons...
 
+  // click function for the start button after entering local player info
+  gameObj.startButton.on("click", function() {
+    
+    // grab the players name to the local object
+    gameObj.localPlayer.name = $("#my-name").val().trim();
 
+    // display it in the appropriate div on the page
+    gameObj.dispLocalName.text(gameObj.localPlayer.name);
 
+    // add it to the appropriate database object
+    // LocalPlayerPath.update({
+      // name: gameObj.localPlayer.name.
+      //})
+
+  });
+
+  // click function for the game buttons to choose Rock/Paper/Scissors
+  gameObj.gameButton.on('click', function(){
+
+    // grab the throw from the button value (set in the html tags)
+    // will be only "ROCK" "PAPER" or "SCISSORS" in all caps
+    gameObj.localPlayer.throw = $(this).val();
+
+    // add it to the appropriate database object
+    // LocalPlayerPath.update({
+      // throw: gameObj.localPlayer.throw.
+      //})
+  })
 
 
 
