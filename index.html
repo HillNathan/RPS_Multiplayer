@@ -46,9 +46,9 @@
         <div class="col-md-3 my-style m-2">
             <div class="h3 text-center" >Player One</div>
             <hr>
-            <div class="player-name" id="local-name"></div>
+            <div class="player-name" id="p1-name"></div>
             <hr>
-            <div class="button-container">
+            <div class="button-container" id="p1-buttons">
             <div class="btn-group-vertical rps-buttons" role="group">
                 <button type="button" class="btn btn-info m-1 game-button" value="ROCK">Rock</button>
                 <button type="button" class="btn btn-info m-1 game-button" value="PAPER">Paper</button>
@@ -56,35 +56,40 @@
             </div></div>
             <hr>
             <ul class="list-group">
-                <li class="list-group-item m-1">Wins : <div id="p1-wins"></div></li>
-                <li class="list-group-item m-1">Losses : <div id="p1-losses"></div></li>
+                <li class="list-group-item m-1">Wins : <span id="p1-wins"></span></li>
+                <li class="list-group-item m-1">Losses : <span id="p1-losses"></span></li>
             </ul>
 
         </div>
 
         <!-- Column for the game info to be in the middle -->
         <div class="col my-style m-2 p-3">
-            <h2>Welcome to Rock Paper Scissors where the rules are made up and the points don't matter.</h2>
-            <p>Please enter your name and click start to begin a game!</p>
-            <form>
+            <h2><span id="info" >Welcome to Rock Paper Scissors!
+            Please enter your name and click start to begin a game!</span></h2>
+            <form id="start-form">
                 <input type="text" id="my-name">
+                    <p><div class="button-container">
+                    <button type="button" class="btn btn-info m1" id="start-btn">Start</button>
+                </div></p>
             </form>
-            <p><div class="button-container">
-                <button type="button" class="btn btn-info m1" id="start-btn">Start</button>
-            </div></p>
         </div>
 
         <!-- Column for player 2 -->
         <div class="col-md-3 my-style m-2">
                 <div class="h3 text-center" >Player 2</div>
                 <hr>
-                <div class="player-name" id="remote-name"></div>
+                <div class="player-name" id="p2-name"></div>
                 <hr>
-                <div id="remote-info">player 2 info goes here...</div>
+                <div class="button-container" id="p2-buttons">
+                    <div class="btn-group-vertical rps-buttons" role="group">
+                        <button type="button" class="btn btn-info m-1 game-button-2" value="ROCK">Rock</button>
+                        <button type="button" class="btn btn-info m-1 game-button-2" value="PAPER">Paper</button>
+                        <button type="button" class="btn btn-info m-1 game-button-2" value="SCISSORS">Scissors</button>
+                    </div></div>
                 <hr>
                 <ul class="list-group">
-                    <li class="list-group-item m-1">Wins : <div id="p2-wins"></div></li>
-                    <li class="list-group-item m-1">Losses : <div id="p2-losses"></div></li>
+                    <li class="list-group-item m-1">Wins : <span id="p2-wins"></span></li>
+                    <li class="list-group-item m-1">Losses : <span id="p2-losses"></span></li>
                 </ul>
         </div>
     </div>

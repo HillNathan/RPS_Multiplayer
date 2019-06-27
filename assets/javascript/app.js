@@ -15,69 +15,221 @@ firebase.initializeApp(firebaseConfig);
 var gameDB = firebase.database();
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
-var legalChoices = ["ROCK", "PAPER", "SCISSORS"];
 
 // Wrap all the rest of the game code in document.ready function. 
 $(document).ready(function() {
-  var gameObj = {
-    // localPlayer and remotePlayer align exactly to the firebase object for the game. 
-    localPlayer: {
-      assigned: false,
-      name: "",
-      wins: 0,
-      losses: 0,
-      throw: "",
-  },
   
-    remotePlayer: {
-      assigned: false,
-      name: "",
-      wins: 0,
-      losses: 0,
-      throw: "",
-    },
-  
+var gameObj = {
   gameButton: $(".game-button"),
   startButton: $("#start-btn"),
-  dispLocalName: $("#local-name"),
-  dispRemoteName: $("#remote-name"),
+  startForm: $("#start-form"),
+  // display key-pairs
+  p1NameDisp: $("#p1-name"),
+  p1WinsDisp: $("#p1-wins"), 
+  p1LossDisp: $("#p1-losses"),
+
+  p2NameDisp: $("#p2-name"),
+  p2WinsDisp: $("#p2-wins"),
+  p2LossDisp: $("#p2-losses"),
+
+  infoDisp: $("#info"),
+
+  stage: "waitingP1",
+
+}
   
+var player1 = {
+  name: "",
+  assigned: false,
+  wins: 0,
+  losses: 0,
+  throw: "",
+};
+
+var player2 = {
+  name: "",
+  assigned: false,
+  wins: 0,
+  losses: 0,
+  throw: "",
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+gameObj.startButton.on('click', function(){
+  if (gameObj.stage === "waitingP1") {
+    player1.assigned = true;
+    player1.name = $("#my-name").val();
+    player1.wins = 0;
+    player1.losses = 0;
+    gameObj.stage = "waitingP2";
+    //show player1 buttons
   }
+  else {
+    player2.assigned = true;
+    player2.name = $("#my-name").val();
+    player2.wins = 0;
+    player2.losses = 0;
+    gameObj.stage = "activeGame";
+    //show player 2 buttons
+    gameObj.startForm.toggle();
+    gameObj.infoDisp.text("Waiting on both players to make a choice");
 
-  // Some click functions for all of our buttons...
+  };
+  console.log("game state: " + gameObj.stage)
 
-  // click function for the start button after entering local player info
-  gameObj.startButton.on("click", function() {
+  console.log(player1);
+  console.log(player2);
+
+  displayStuff();
+
+});
+
+gameObj.gameButton.on('click', function() {
+  player1.throw = $(this).val();
+
+  console.log(player1.throw);
+  console.log(player2.throw);
+
+  var temp = (player1.throw !== "")
+  console.log(temp);
+  temp = (player2.throw === "");
+  console.log(temp);
+
+  if (player1.throw === "" && player2.throw === "") {
+    gameObj.infoDisp.text("Waiting on both players to make a choice");
+  }
+  else if ((player1.throw !== "") && (player2.throw === "")) {
+    gameObj.infoDisp.text("Waiting on player two to make a choice");
+  }
+  else if (player1.throw === "" && player2.throw !== "") {
+    gameObj.infoDisp.text("Waiting on player one to make a choice");
+  }
+  else {
+    var winner = determineWinner(player1.throw, player2.throw);
+      if (winner === "player1") {
+        gameObj.infoDisp.text("Player 1 is the winner!");
+        player1.wins++
+        player2.losses++
+        player1.throw = "";
+        player2.throw = "";
+      }
+      else if (winner === "player2") {
+        gameObj.infoDisp.text("Player2 is the winner!");
+        player1.losses++
+        player2.wins++
+        player1.throw = "";
+        player2.throw = "";
+      }
+      else {
+        gameObj.infoDisp.text("It is a tie!");
+        player1.throw = "";
+        player2.throw = "";
+      }
+  }
+});
+
+  $(".game-button-2").on('click', function() {
+    player2.throw = $(this).val();
     
-    // grab the players name to the local object
-    gameObj.localPlayer.name = $("#my-name").val().trim();
+  console.log(player1.throw);
+  console.log(player2.throw);
 
-    // display it in the appropriate div on the page
-    gameObj.dispLocalName.text(gameObj.localPlayer.name);
-
-    // add it to the appropriate database object
-    // LocalPlayerPath.update({
-      // name: gameObj.localPlayer.name.
-      //})
-
+    if (player1.throw === "" && player2.throw === "") {
+      gameObj.infoDisp.text("Waiting on both players to make a choice");
+    }
+    else if (player1.throw !== "" && player2.throw === "") {
+      gameObj.infoDisp.text("Waiting on player two to make a choice");
+    }
+    else if (player1.throw === "" && player2.throw !== "") {
+      gameObj.infoDisp.text("Waiting on player one to make a choice");
+    }
+    else {
+      var winner = determineWinner(player1.throw, player2.throw);
+      if (winner === "player1") {
+        gameObj.infoDisp.text("Player 1 is the winner!");
+        player1.wins++
+        player2.losses++
+        player1.throw = "";
+        player2.throw = "";
+      }
+      else if (winner === "player2") {
+        gameObj.infoDisp.text("Player2 is the winner!");
+        player1.losses++
+        player2.wins++
+        player1.throw = "";
+        player2.throw = "";
+      }
+      else {
+        gameObj.infoDisp.text("It is a tie!");
+        player1.throw = "";
+        player2.throw = "";
+      }
+    }
+    displayStuff();
   });
 
-  // click function for the game buttons to choose Rock/Paper/Scissors
-  gameObj.gameButton.on('click', function(){
 
-    // grab the throw from the button value (set in the html tags)
-    // will be only "ROCK" "PAPER" or "SCISSORS" in all caps
-    gameObj.localPlayer.throw = $(this).val();
+function displayStuff() {
+  gameObj.p1NameDisp.text(player1.name);
+  gameObj.p1WinsDisp.text(player1.wins);
+  gameObj.p1LossDisp.text(player1.losses);
 
-    // add it to the appropriate database object
-    // LocalPlayerPath.update({
-      // throw: gameObj.localPlayer.throw.
-      //})
-  })
-
-
-
-
+  gameObj.p2NameDisp.text(player2.name);
+  gameObj.p2WinsDisp.text(player2.wins);
+  gameObj.p2LossDisp.text(player2.losses)
+}
 
 
 });
+
+$(window).on("unload", function() {
+  // Do Something when the window closes - i.e. remove the local player from the database and reset it to wait for another user. 
+});
+
+
+function determineWinner(choice1, choice2) {
+  if (choice1 === choice2) {
+    return "tied";
+  }
+
+  if (choice1 === "ROCK") {
+    if (choice2 === "PAPER") {
+      return "player2"
+    }
+    else {
+      return "player1"
+    }
+  } else 
+  if (choice1 === "PAPER") {
+    if (choice2 === "ROCK") {
+      return "player1";
+    }
+    else {
+      return "player2"
+    }
+  }
+  else { // choice1 is SCISSORS
+    if (choice2 === "ROCK") {
+      return "player2";
+    }
+    else {
+      return "player1";
+    }
+  }
+
+
+
+}
