@@ -12,7 +12,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 // --------------------------------------------------------------------------------
 // Now we set up the database reference:
-var gameDB = firebase.database();
+var database = firebase.database();
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
 
@@ -33,9 +33,10 @@ var gameObj = {
   p2LossDisp: $("#p2-losses"),
 
   infoDisp: $("#info"),
-
+  resultDisp: $("#result"),
+  localPlayer: "",
   stage: "waitingP1",
-
+  prevResult: "",
 }
   
 var player1 = {
@@ -54,28 +55,110 @@ var player2 = {
   throw: "",
 }
 
+$("#p1-buttons").hide();
+$("#p2-buttons").hide();
 
+database.ref().on("value", function(snapshot) {
 
+  player1 = snapshot.child('player1').val();
+  player2 = snapshot.child('player2').val();
 
+  if (player1.assigned && player2.assigned) {
+    console.log(gameObj.prevResult);
 
+    if (gameObj.prevResult === "tied") {
+      gameObj.resultDisp.text("The game was a tie!");
+    }
+    if (gameObj.prevResult === "player1") {
+      gameObj.resultDisp.text("Player 1 is the winner!");
+    }
+    if (gameObj.prevResult === "player2") {
+      gameObj.resultDisp.text("Player 2 is the winner!");
+    }
+    gameObj.startForm.hide();
+    gameObj.infoDisp.text("Waiting on both players to make a choice");
+    gameObj.stage = "active";
+    if (player1.throw === "" && player2.throw === "") {
+      gameObj.infoDisp.text("Waiting on both players to make a choice");
+    }
+    else if ((player1.throw !== "") && (player2.throw === "")) {
+      gameObj.infoDisp.text("Waiting on player two to make a choice");
+    }
+    else if (player1.throw === "" && player2.throw !== "") {
+      gameObj.infoDisp.text("Waiting on player one to make a choice");
+    }
+    else {
+      console.log("find a winner");
+      var winner = determineWinner(player1.throw, player2.throw);
+      console.log(winner);
+        if (winner === "player1") {
+          gameObj.prevResult = "player1";
+          player1.wins++
+          player2.losses++
+          player1.throw = "";
+          player2.throw = "";
+          database.ref().update({player1, player2, winner});
+        }
+        else if (winner === "player2") {
+          gameObj.prevResult = "player2";
+          player1.losses++
+          player2.wins++  
+          player1.throw = "";
+          player2.throw = "";
+          database.ref().update({player1, player2,winner});
+        }
+        else {
+          gameObj.infoDisp.text("It is a tie!");
+          gameObj.prevResult = "tied"
+          player1.throw = "";
+          player2.throw = "";
+          database.ref().update({player1, player2, winner});
+        }
+    }
+  }
 
+  if (!player1.assigned && player2.assigned) {
+    console.log("have player2 need player 1")
+    displayStuff();
+  }
 
+  if (player1.assigned && !player2.assigned) {
+    console.log("have player1 need player 2");
+    displayStuff();
+  }
 
+  if (!player1.assigned && !player2.assigned) {
+    console.log("need both players");
+    displayStuff(); 
+  }
 
+if (gameObj.localPlayer === "player1") {
+    displayStuff();
+    $("#p2-buttons").hide();
+    gameObj.startForm.hide();
+  }
+  else if (gameObj.localPlayer === "player2") {
+    displayStuff();
+    $("#p1-buttons").hide();
+    gameObj.startForm.hide();
+  } 
 
-
-
-
-
+});
 
 gameObj.startButton.on('click', function(){
-  if (gameObj.stage === "waitingP1") {
+  if (!player1.assigned) {
     player1.assigned = true;
     player1.name = $("#my-name").val();
     player1.wins = 0;
     player1.losses = 0;
     gameObj.stage = "waitingP2";
-    //show player1 buttons
+    gameObj.localPlayer = "player1";
+
+    database.ref().update({
+      player1
+    })
+    $("#p1-buttons").show();
+    
   }
   else {
     player2.assigned = true;
@@ -83,9 +166,16 @@ gameObj.startButton.on('click', function(){
     player2.wins = 0;
     player2.losses = 0;
     gameObj.stage = "activeGame";
+    gameObj.localPlayer = "player2";
     //show player 2 buttons
-    gameObj.startForm.toggle();
+
+    database.ref().update({
+      player2
+    })
+
+    gameObj.startForm.hide();
     gameObj.infoDisp.text("Waiting on both players to make a choice");
+    $("#p2-buttons").show();
 
   };
   console.log("game state: " + gameObj.stage)
@@ -103,42 +193,10 @@ gameObj.gameButton.on('click', function() {
   console.log(player1.throw);
   console.log(player2.throw);
 
-  var temp = (player1.throw !== "")
-  console.log(temp);
-  temp = (player2.throw === "");
-  console.log(temp);
-
-  if (player1.throw === "" && player2.throw === "") {
-    gameObj.infoDisp.text("Waiting on both players to make a choice");
-  }
-  else if ((player1.throw !== "") && (player2.throw === "")) {
-    gameObj.infoDisp.text("Waiting on player two to make a choice");
-  }
-  else if (player1.throw === "" && player2.throw !== "") {
-    gameObj.infoDisp.text("Waiting on player one to make a choice");
-  }
-  else {
-    var winner = determineWinner(player1.throw, player2.throw);
-      if (winner === "player1") {
-        gameObj.infoDisp.text("Player 1 is the winner!");
-        player1.wins++
-        player2.losses++
-        player1.throw = "";
-        player2.throw = "";
-      }
-      else if (winner === "player2") {
-        gameObj.infoDisp.text("Player2 is the winner!");
-        player1.losses++
-        player2.wins++
-        player1.throw = "";
-        player2.throw = "";
-      }
-      else {
-        gameObj.infoDisp.text("It is a tie!");
-        player1.throw = "";
-        player2.throw = "";
-      }
-  }
+  database.ref('player1').update({
+    throw: player1.throw,
+  })
+  
 });
 
   $(".game-button-2").on('click', function() {
@@ -147,38 +205,10 @@ gameObj.gameButton.on('click', function() {
   console.log(player1.throw);
   console.log(player2.throw);
 
-    if (player1.throw === "" && player2.throw === "") {
-      gameObj.infoDisp.text("Waiting on both players to make a choice");
-    }
-    else if (player1.throw !== "" && player2.throw === "") {
-      gameObj.infoDisp.text("Waiting on player two to make a choice");
-    }
-    else if (player1.throw === "" && player2.throw !== "") {
-      gameObj.infoDisp.text("Waiting on player one to make a choice");
-    }
-    else {
-      var winner = determineWinner(player1.throw, player2.throw);
-      if (winner === "player1") {
-        gameObj.infoDisp.text("Player 1 is the winner!");
-        player1.wins++
-        player2.losses++
-        player1.throw = "";
-        player2.throw = "";
-      }
-      else if (winner === "player2") {
-        gameObj.infoDisp.text("Player2 is the winner!");
-        player1.losses++
-        player2.wins++
-        player1.throw = "";
-        player2.throw = "";
-      }
-      else {
-        gameObj.infoDisp.text("It is a tie!");
-        player1.throw = "";
-        player2.throw = "";
-      }
-    }
-    displayStuff();
+  database.ref('player2').update({
+    throw: player2.throw,
+  })
+
   });
 
 
@@ -196,7 +226,25 @@ function displayStuff() {
 });
 
 $(window).on("unload", function() {
-  // Do Something when the window closes - i.e. remove the local player from the database and reset it to wait for another user. 
+  if (gameObj.localPlayer = "player1") {
+    player1.name = "";
+    player1.wins = 0;
+    player1.losses = 0;
+    player1.throw = "";
+    player1.assigned = false;
+
+    database.ref().update(player1);
+
+}
+if (gameObj.localPlayer = "player2") {
+  player2.name = "";
+  player2.wins = 0;
+  player2.losses = 0;
+  player2.throw = "";
+  player2.assigned = false;
+
+  database.ref().update(player2);
+}
 });
 
 
